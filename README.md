@@ -5,7 +5,7 @@ In this fork, I have removed address geocoding (you manually pick a location on 
 also incorperated a default formfield so you don't have to mess with ModelAdmins - just add the 
 modelfield to your model. 
 
-![Screenshot](http://github.com/pastylegs/django-gmap-admin/blob/master/screenshot.png)
+![Screenshot](http://github.com/pastylegs/django-gmap-admin/blob/master/screenshot.png?raw=True)
 
 USAGE:
 ------
