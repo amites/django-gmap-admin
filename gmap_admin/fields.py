@@ -84,7 +84,10 @@ class GeoLocationField(models.CharField):
     def get_prep_value(self, value):
         if value == u'':
             return None
-        return "%s,%s" % (value.lat, value.lon)
+        try:
+            return "%s,%s" % (value.lat, value.lon)
+        except AttributeError:
+            return ''
 
     def get_prep_lookup(self, lookup_type, value):
         # We only handle 'exact' and 'in'. All others are errors.
