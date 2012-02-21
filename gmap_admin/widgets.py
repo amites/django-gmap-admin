@@ -15,14 +15,17 @@ class GoogleMapsWidget(widgets.HiddenInput):
 			]
 
 	def render(self, name, value, attrs=None):
-		if value is None:
+		if value is None or value == ',':
 			value = ""
 			center_lng = gmap_settings.DEFAULT_LNG
 			center_lat = gmap_settings.DEFAULT_LAT
 		final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-		if value != "":
+		if len(value) > 1:
 			final_attrs['value'] = force_unicode(self._format_value(value))
 			center_lat,center_lng = final_attrs['value'].split(',')
+		else:
+			center_lat = gmap_settings.DEFAULT_LAT
+			center_lng = gmap_settings.DEFAULT_LNG
 		html = u"""
 					<input%(attrs)s />
 					<div class="map_canvas_wrapper" style="display:inline-block;">
@@ -30,20 +33,23 @@ class GoogleMapsWidget(widgets.HiddenInput):
 						<script>
 							django.jQuery(function($) {
 								$("#%(field_id)s").gmapAdmin({
-										'zoom': %(zoom)s,
-										'lat': '%(center_lat)s',
-										'lng': '%(center_lng)s',
-										'map_elem': '#%(map_id)s',
-										'delete_elem': '#%(delete_id)s',
+										'zoom': %(zoom)s
+										,'lat': '%(center_lat)s'
+										,'lng': '%(center_lng)s'
+										,'map_elem': '#%(map_id)s'
+										,'delete_elem': '#%(delete_id)s'
+										,'add_elem': '#%(add_id)s'
 								});
 							});
 						</script>
 					</div>
 					<p><a id="%(delete_id)s" href="javascript:void(0)">Remove Marker</a></p>
+					<p><a id="%(add_id)s" href="javascript:void(0)">Add Marker</a></p>
 					<p class="help">Double click to zoom in and center on a location. Right click to set the marker on a position. You can also drag and drop the marker.</p>
 				""" % { 
 						'field_id': attrs['id'],
 						'delete_id': 'map_delete_%s'%attrs['id'],
+                        'add_id' : 'map_add_%s'%attrs['id'],
 						'map_id': 'map_%s'%attrs['id'],
 						'attrs': flatatt(final_attrs),
 						'height': gmap_settings.HEIGHT,

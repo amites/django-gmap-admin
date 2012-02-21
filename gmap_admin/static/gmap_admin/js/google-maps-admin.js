@@ -2,11 +2,12 @@ django.jQuery(function($){
 	
 	$.fn.gmapAdmin = function(options){
 		var defaults = {	
-			'zoom':8,	
-			'lat':'53.311',
-			'lng':'-6.24',
-			'map_elem' : '#id_map',
-			'delete_elem' : '#id_delete',
+			'zoom':8
+			,'lat':'53.311'
+			,'lng':'-6.24'
+			,'map_elem' : '#id_map'
+			,'delete_elem' : '#id_delete'
+            ,'add_elem' : '#map_add'
 		};
 		
 		var options = $.extend(defaults, options);
@@ -66,7 +67,7 @@ django.jQuery(function($){
 			center : latlng,
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
 		});
-		// If there is a value in the field, load it onto the map
+        // If there is a value in the field, load it onto the map
 		if(get_field()!==""){
 			set_marker(new google.maps.LatLng(get_field()[0],get_field()[1]));
 		}
@@ -81,6 +82,10 @@ django.jQuery(function($){
 				remove_field();
 			}
 		});
-		
+
+        $(options.add_elem).click(function(){
+            set_marker(new google.maps.LatLng(options.lat,options.lng));
+            set_field(new google.maps.LatLng(options.lat,options.lng));
+        });
 	};
 });
