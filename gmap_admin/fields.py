@@ -1,9 +1,9 @@
 from django.db import models
 from django.core import exceptions
 from django import forms
-from django.utils.encoding import smart_unicode, smart_str, force_unicode
 
-from widgets import GoogleMapsWidget
+from gmap_admin.widgets import GoogleMapsWidget
+
 
 def typename(obj):
     """Returns the type of obj as a string. More descriptive and specific than
@@ -13,8 +13,9 @@ def typename(obj):
     else:
         return type(obj).__name__
 
+
 class GeoPt(object):
-    "A geographical point."
+    """A geographical point."""
 
     lat = None
     lon = None
@@ -31,31 +32,35 @@ class GeoPt(object):
     def __len__(self):
         return len(self.__unicode__())
 
-    def _split_geo_point(self, geo_point):
-        "splits the geo point into lat and lon"
+    @staticmethod
+    def _split_geo_point(geo_point):
+        """splits the geo point into lat and lon"""
         try:
             return geo_point.split(',')
         except (AttributeError, ValueError):
             raise exceptions.ValidationError(
-                'Expected a "lat,long" formatted string; received %s (a %s).' %
-            (geo_point, typename(geo_point)))
+                'Expected a "lat,long" formatted string; received {} (a {}).'.format(
+                    geo_point, typename(geo_point)))
 
-    def _validate_geo_range(self, geo_part, range_val):
+    @staticmethod
+    def _validate_geo_range(geo_part, range_val):
         try:
             geo_part = float(geo_part)
             if abs(geo_part) > range_val:
                 raise exceptions.ValidationError(
-                'Must be between -%s and %s; received %s' % (range_val, range_val, geo_part)
-            )
+                    'Must be between -%s and %s; received %s' % (range_val, range_val, geo_part)
+                )
         except (TypeError, ValueError):
             raise exceptions.ValidationError(
                 'Expected float, received %s (a %s).' % (geo_part, typename(geo_part))
             )
         return geo_part
 
+
 class GoogleMapsFormField(forms.CharField):
     pass
-          
+
+
 class GeoLocationField(models.CharField):
     """
     A geographical point, specified by floating-point latitude and longitude
@@ -76,7 +81,6 @@ class GeoLocationField(models.CharField):
         super(GeoLocationField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        print "asdf:%s"%value
         if isinstance(value, GeoPt):
             return value
         return GeoPt(value)
@@ -99,17 +103,18 @@ class GeoLocationField(models.CharField):
             raise TypeError('Lookup type %r not supported.' % lookup_type)
 
     def value_to_string(self, obj):
-        print obj
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
 
     def formfield(self, **kwargs):
-        defaults = {'widget':GoogleMapsWidget}
+        defaults = {'widget': GoogleMapsWidget, }
         kwargs.update(defaults)
         return super(GeoLocationField, self).formfield(form_class=GoogleMapsFormField, **kwargs)
-        
+
+
+# legacy support for south
 try:
- 	from south.modelsinspector import add_introspection_rules
-	add_introspection_rules([], ["^gmap_admin\.fields\.GeoLocationField"])
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^gmap_admin\.fields\.GeoLocationField"])
 except ImportError:
-	pass
+    pass
