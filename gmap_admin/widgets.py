@@ -1,14 +1,20 @@
-from django.conf import settings
 from django.forms import widgets
-from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.forms.utils import flatatt
 
 from gmap_admin import settings as gmap_settings
 
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
+
+try:
+    from django.forms.utils import flatatt
+except ImportError:
+    from django.forms.util import flatatt
+
 
 class GoogleMapsWidget(widgets.HiddenInput):
-
     class Media:
         js = [
             'http://maps.google.com/maps/api/js?sensor=false',
@@ -24,7 +30,7 @@ class GoogleMapsWidget(widgets.HiddenInput):
         final_attrs = self.build_attrs(attrs, {'type': self.input_type, 'name': name, })
         # final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if len(value) > 1:
-            final_attrs['value'] = force_str(self._format_value(value))
+            final_attrs['value'] = force_text(self._format_value(value))
             center_lat,center_lng = final_attrs['value'].split(',')
         else:
             center_lat = gmap_settings.DEFAULT_LAT

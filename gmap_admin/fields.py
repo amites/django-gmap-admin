@@ -1,8 +1,13 @@
+import logging
+
 from django.db import models
 from django.core import exceptions
 from django import forms
 
 from gmap_admin.widgets import GoogleMapsWidget
+
+
+logger = logging.getLogger(__name__)
 
 
 def typename(obj):
@@ -27,7 +32,7 @@ class GeoPt(object):
         self.lon = self._validate_geo_range(lon, 180)
 
     def __unicode__(self):
-        return "%s,%s" % (self.lat, self.lon)
+        return ','.join(self.lat, self.lon)
 
     def __len__(self):
         return len(self.__unicode__())
@@ -48,11 +53,12 @@ class GeoPt(object):
             geo_part = float(geo_part)
             if abs(geo_part) > range_val:
                 raise exceptions.ValidationError(
-                    'Must be between -%s and %s; received %s' % (range_val, range_val, geo_part)
+                    'Must be between - {} and {}; received {}'.format(range_val, range_val, geo_part)
                 )
         except (TypeError, ValueError):
             raise exceptions.ValidationError(
-                'Expected float, received %s (a %s).' % (geo_part, typename(geo_part))
+                'Expected float, received %s (a %s).' % (geo_part,
+                                                         typename(geo_part))
             )
         return geo_part
 
@@ -74,7 +80,8 @@ class GeoLocationField(models.CharField):
     serialized string, or if lat and lon are not valid floating points in the
     ranges [-90, 90] and [-180, 180], respectively.
     """
-    description = "A geographical point, specified by floating-point latitude and longitude coordinates."
+    description = 'A geographical point, specified by floating-point ' \
+                  'latitude and longitude coordinates.'
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 100
@@ -89,7 +96,7 @@ class GeoLocationField(models.CharField):
         if value == u'':
             return None
         try:
-            return "%s,%s" % (value.lat, value.lon)
+            return ','.join(value.lat, value.lon)
         except AttributeError:
             return ''
 
@@ -103,6 +110,7 @@ class GeoLocationField(models.CharField):
             raise TypeError('Lookup type %r not supported.' % lookup_type)
 
     def value_to_string(self, obj):
+        logger.debug(obj)
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
 
