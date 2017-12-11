@@ -57,8 +57,7 @@ class GeoPt(object):
                 )
         except (TypeError, ValueError):
             raise exceptions.ValidationError(
-                'Expected float, received %s (a %s).' % (geo_part,
-                                                         typename(geo_part))
+                'Expected float, received {} (a {}).'.format(geo_part, typename(geo_part))
             )
         return geo_part
 
