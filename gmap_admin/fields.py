@@ -37,7 +37,7 @@ class GeoPt(object):
         return ','.join([str(self.lat), str(self.lon)])
 
     def __len__(self):
-        return len(self.__unicode__())
+        return len(self.__str__())
 
     @staticmethod
     def _split_geo_point(geo_point):
