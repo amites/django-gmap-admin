@@ -34,7 +34,7 @@ class GeoPt(object):
         self.lon = self._validate_geo_range(lon, 180)
 
     def __str__(self):
-        return ','.join([self.lat, self.lon])
+        return ','.join([str(self.lat), str(self.lon)])
 
     def __len__(self):
         return len(self.__unicode__())
@@ -97,7 +97,7 @@ class GeoLocationField(models.CharField):
         if value == u'':
             return None
         try:
-            return ','.join(value.lat, value.lon)
+            return ','.join([str(self.lat), str(self.lon)])
         except AttributeError:
             return ''
 
