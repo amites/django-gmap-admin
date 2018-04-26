@@ -1,8 +1,9 @@
 import logging
 
-from django.db import models
-from django.core import exceptions
 from django import forms
+from django.core import exceptions
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from gmap_admin.widgets import GoogleMapsWidget
 
@@ -19,6 +20,7 @@ def typename(obj):
         return type(obj).__name__
 
 
+@python_2_unicode_compatible
 class GeoPt(object):
     """A geographical point."""
 
@@ -31,7 +33,7 @@ class GeoPt(object):
         self.lat = self._validate_geo_range(lat, 90)
         self.lon = self._validate_geo_range(lon, 180)
 
-    def __unicode__(self):
+    def __str__(self):
         return ','.join(self.lat, self.lon)
 
     def __len__(self):
