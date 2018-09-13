@@ -1,23 +1,15 @@
 from django.forms import widgets
+from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
 
-from gmap_admin import settings as gmap_settings
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-
-try:
-    from django.forms.utils import flatatt
-except ImportError:
-    from django.forms.util import flatatt
+from gmap_admin import settings
 
 
 class GoogleMapsWidget(widgets.HiddenInput):
     class Media:
         js = [
-            'http://maps.google.com/maps/api/js?sensor=false',
+            'http://maps.google.com/maps/api/js?key={}&sensor=false'.format(settings.GOOGLE_MAPS_KEY),
             'gmap_admin/js/google-maps-admin.js',
             ]
 
@@ -28,8 +20,8 @@ class GoogleMapsWidget(widgets.HiddenInput):
     def render(self, name, value, attrs=None):
         if value is None or value == ',':
             value = ""
-            center_lng = gmap_settings.DEFAULT_LNG
-            center_lat = gmap_settings.DEFAULT_LAT
+            center_lng = settings.DEFAULT_LNG
+            center_lat = settings.DEFAULT_LAT
         #     def build_attrs(self, base_attrs, extra_attrs=None):
         final_attrs = self.build_attrs(attrs, {'type': self.input_type, 'name': name, })
         # final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
@@ -37,8 +29,8 @@ class GoogleMapsWidget(widgets.HiddenInput):
             final_attrs['value'] = force_text(self._format_value(value))
             center_lat,center_lng = final_attrs['value'].split(',')
         else:
-            center_lat = gmap_settings.DEFAULT_LAT
-            center_lng = gmap_settings.DEFAULT_LNG
+            center_lat = settings.DEFAULT_LAT
+            center_lng = settings.DEFAULT_LNG
         return mark_safe('''
                     <input{attrs} type="hidden" />
                     <div class="map_canvas_wrapper" style="display:inline-block;">
@@ -66,9 +58,9 @@ class GoogleMapsWidget(widgets.HiddenInput):
             add_id='map_add_{}'.format(attrs['id']),
             map_id='map_{}'.format(attrs['id']),
             attrs=flatatt(final_attrs),
-            height=gmap_settings.HEIGHT,
-            width=gmap_settings.WIDTH,
-            zoom=gmap_settings.ZOOM,
+            height=settings.HEIGHT,
+            width=settings.WIDTH,
+            zoom=settings.ZOOM,
             center_lng=center_lng,
             center_lat=center_lat,
         ))
